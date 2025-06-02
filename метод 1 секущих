@@ -1,0 +1,57 @@
+#include <iostream>
+#include <cmath>
+#include <stdexcept>
+#include <iomanip>
+
+// Пример функции: x^3 - 0.2*x^2 + 0.5*x - 1
+double example_function(double x) {
+    return x*x*x - 0.2*x*x + 0.5*x - 1.0;
+}
+
+// Метод секущих
+std::pair<double, int> secant_method(double (*f)(double), double x0, double x1, double epsilon, int max_iter) {
+    int iteration = 0;
+    double x2;
+
+    while (iteration < max_iter) {
+        double f_x0 = f(x0);
+        double f_x1 = f(x1);
+
+        if (fabs(f_x1 - f_x0) < 1e-14) {
+            throw std::runtime_error("Деление на ноль в методе секущих");
+        }
+
+        x2 = x1 - f_x1 * (x1 - x0) / (f_x1 - f_x0);
+
+        if (fabs(x2 - x1) < epsilon) {
+            return {x2, iteration};
+        }
+
+        x0 = x1;
+        x1 = x2;
+        iteration++;
+    }
+
+    throw std::runtime_error("Не удалось найти корень методом секущих");
+}
+
+int main() {
+    double a = 0.0;           // левый край
+    double b = 2.0;           // правый край
+    double epsilon = 1e-6;    // точность
+    int max_iter = 100;       // максимальное число итераций
+
+    try {
+        auto [root, iterations] = secant_method(example_function, a, b, epsilon, max_iter);
+
+        std::cout << std::fixed << std::setprecision(12);
+        std::cout << "Корень уравнения: " << root << std::endl;
+        std::cout << "Количество итераций: " << iterations << std::endl;
+        std::cout << "Значение функции: f(" << root << ") = " << example_function(root) << std::endl;
+    }
+    catch (const std::exception& e) {
+        std::cerr << e.what() << std::endl;
+    }
+
+    return 0;
+}
