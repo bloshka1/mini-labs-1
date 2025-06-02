@@ -1,0 +1,55 @@
+#include <iostream>
+#include <cmath>
+#include <iomanip> // Для установки точности вывода
+
+// Функция, для которой ищем корень: x^3 - 0.2*x^2 + 0.5*x - 1
+double example_function(double x) {
+    return x*x*x - 0.2*x*x + 0.5*x - 1;
+}
+
+// Производная функции: 3*x^2 - 0.4*x + 0.5
+double derivative_example_function(double x) {
+    return 3*x*x - 0.4*x + 0.5;
+}
+
+// Метод касательных (метод Ньютона)
+// f - функция, df - производная, x0 - начальное приближение
+// epsilon - точность, max_iter - максимальное число итераций
+std::pair<double, int> tangent_method(double (*f)(double), double (*df)(double), double x0, double epsilon, int max_iter) {
+    double x = x0;
+    for (int i = 0; i < max_iter; ++i) {
+        double f_x = f(x);
+        double df_x = df(x);
+
+        if (df_x == 0) {
+            std::cerr << "Производная равна нулю, метод не может продолжать работу." << std::endl;
+            break;
+        }
+
+        double x_new = x - f_x / df_x;
+
+        if (std::abs(x_new - x) < epsilon) {
+            return {x_new, i + 1}; // нашли корень
+        }
+        x = x_new;
+    }
+    return {x, max_iter}; // вернули последнее приближение
+}
+
+int main() {
+    double x0 = 1.0; // начальное приближение
+    double epsilon = 1e-6; // точность
+    int max_iter = 100; // максимальное число итераций
+
+    auto [root, iterations] = tangent_method(example_function, derivative_example_function, x0, epsilon, max_iter);
+
+    double fun_value = example_function(root);
+
+    std::cout << std::fixed << std::setprecision(12);
+    std::cout << "Корень уравнения: " << root << std::endl;
+    std::cout << "Количество итераций: " << iterations << std::endl;
+    std::cout << "Значение функции в корне: f(" << root << ") = " << fun_value << std::endl;
+
+    return 0;
+}
+
