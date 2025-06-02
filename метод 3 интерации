@@ -1,0 +1,40 @@
+#include <iostream>
+#include <cmath>
+#include <iomanip>
+
+// Функция example_function: f(x) = x - 0.2*(x^2 + 6)
+double example_function(double x) {
+    return x - 0.2 * (x * x + 6.0);
+}
+
+// Метод простых итераций
+double simple_iteration_method(double x0, double epsilon) {
+    double x = x0;
+    double x_new;
+    int iter = 0;
+
+    while (true) {
+        x_new = 0.2 * (x * x + 6.0);
+
+        if (std::fabs(x_new - x) < epsilon) {
+            std::cout << "Количество итераций: " << iter << std::endl;
+            return x_new;
+        }
+
+        x = x_new;
+        iter++;
+    }
+}
+
+int main() {
+    double x0 = 0.0;           // начальное значение
+    double epsilon = 1e-8;     // точность
+
+    double root = simple_iteration_method(x0, epsilon);
+
+    std::cout << std::fixed << std::setprecision(12);
+    std::cout << "Решение уравнения: x = " << root << std::endl;
+    std::cout << "Значение функции: f(" << root << ") = " << example_function(root) << std::endl;
+
+    return 0;
+}
